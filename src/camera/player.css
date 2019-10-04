@@ -1,0 +1,18 @@
+.camera-player {
+    box-shadow: 0 0 0.1em 0.1em rgba(0, 0, 0, 0.1);
+    margin: 1em 0;
+}
+
+.camera-player video.player {
+    display: block;
+    width: 100%;
+}
+
+.camera-player .info {
+    color: #666;
+    padding: 0.5em;
+}
+
+.camera-player .info .icon {
+    margin-right: 0.25em;
+}

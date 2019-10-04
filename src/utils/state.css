@@ -1,0 +1,36 @@
+.app-state {
+    box-shadow: 0 0 0.1em 0.1em rgba(0, 0, 0, 0.1);
+    display: block;
+    line-height: 1.5em;
+    margin: 1em 0;
+    padding: 0.5em;
+}
+
+.app-state * {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.app-state .icon {
+    margin-right: 0.25em;
+}
+
+.app-state.init {
+    color: #666;
+}
+
+.app-state.start-camera {
+    color: #666;
+}
+
+.app-state.connecting, .app-state.handshake {
+    color: #cb7e1f; /* Yamabukicha */
+}
+
+.app-state.connected {
+    color: #407A52; /* Rokusho */
+}
+
+.app-state.retry {
+    color: #c3272b; /* Akabeni */
+}

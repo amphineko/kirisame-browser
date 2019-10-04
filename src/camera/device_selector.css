@@ -1,0 +1,52 @@
+.device-selector {
+    box-shadow: 0 0 0.1em 0.1em rgba(0, 0, 0, 0.1);
+}
+
+.device-selector .prompt {
+    display: block;
+    font-size: 1.25em;
+    padding: 0.4em;
+}
+
+.device-selector .not-found {
+    color: #c3272b; /* Akabeni */
+    padding: 0.5em;
+}
+
+.device-selector .not-found .icon {
+    margin-right: 0.25em;
+}
+
+.device-selector .device-row, .device-selector .not-found {
+    border-top: 0.05em solid #bbb;
+    display: block;
+    padding: 0.5em;
+}
+
+.device-selector .device-row {
+    text-decoration: none;
+}
+
+.device-selector .device-row.selected {
+    background: #eee;
+    box-shadow: inset 0 0 0.1em 0.1em rgba(0, 0, 0, 0.1);
+}
+
+.device-selector .device-row span {
+    margin: 0.25em 0;
+}
+
+.device-selector .device-row .deviceId {
+    color: #555;
+    display: block;
+    font-size: 0.75em;
+}
+
+.device-selector .device-row .label {
+    color: #222;
+    display: block;
+}
+
+.device-selector .device-row .label .icon {
+    margin-right: 0.25em;
+}

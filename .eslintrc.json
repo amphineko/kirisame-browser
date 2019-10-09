@@ -20,6 +20,7 @@
             "jsx": true
         },
         "ecmaVersion": 2020,
+        "project": "./tsconfig.json",
         "sourceType": "module"
     },
     "plugins": [
@@ -28,18 +29,53 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "import/prefer-default-export": "off",
         "indent": [
             "error",
-            4
+            4,
+            {
+                "SwitchCase": 1
+            }
         ],
+        "linebreak-style": "off",
+        "no-unused-vars": "off",
+        "react/jsx-filename-extension": [
+            "error",
+            {
+                "extensions": [
+                    ".jsx",
+                    ".tsx"
+                ]
+            }
+        ],
+        "react/jsx-indent": ["error", 4],
+        "react/jsx-indent-props": ["error", 4],
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "error",
         "semi": [
             "error",
             "never"
+        ],
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            {
+                "vars": "all",
+                "args": "after-used",
+                "ignoreRestSiblings": false
+            }
         ]
     },
     "settings": {
+        "import/resolver": {
+            "node": {
+                "extensions": [
+                    ".js",
+                    ".jsx",
+                    ".ts",
+                    ".tsx"
+                ]
+            }
+        },
         "react": {
             "version": "detect"
         }

@@ -5,7 +5,8 @@ import { Configuration } from './config'
 import { AppMain } from './app'
 
 async function getConfiguration() {
-    return await (await fetch('config.json')).json<Configuration>()
+    const file = await fetch('config.json')
+    return file.json<Configuration>()
 }
 
 async function init() {

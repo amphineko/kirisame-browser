@@ -34,6 +34,7 @@ export class WebSocketSession {
     private readonly config: SessionConfiguration
 
     private accepted: boolean = false
+
     private isShutdown: boolean = false
 
     private socket: WebSocket = undefined
@@ -46,10 +47,11 @@ export class WebSocketSession {
     }
 
     private handleAccept(event: MessageEvent, socket: WebSocket) {
-        if (socket !== this.socket)
+        if (socket !== this.socket) {
             return
+        }
 
-        const data = event.data
+        const data = event.data as string
 
         if (typeof data !== 'string') {
             socket.close(4001, 'Handshake failure: Non-string response')
@@ -75,12 +77,13 @@ export class WebSocketSession {
     }
 
     private handshake(socket: WebSocket) {
-        if (socket !== this.socket)
+        if (socket !== this.socket) {
             return
+        }
 
         socket.send(JSON.stringify({
             data: this.config.metadata,
-            op: 'start-stream'
+            op: 'start-stream',
         } as SessionHandshake))
 
         socket.addEventListener('message', (event) => {
@@ -91,15 +94,18 @@ export class WebSocketSession {
     }
 
     private connect() {
-        if (this.isShutdown)
+        if (this.isShutdown) {
             return
+        }
 
         this.events.dispatchEvent(new Event('connect' as SessionEventType))
 
         const socket = new WebSocket(this.config.url)
+        this.accepted = false
 
-        if (this.socket)
+        if (this.socket) {
             this.socket.close(1000, 'Reconnect')
+        }
         this.socket = socket
 
         socket.addEventListener('close', () => {
@@ -116,9 +122,17 @@ export class WebSocketSession {
         }, { once: true })
     }
 
+    public send(chunk: ArrayBuffer) {
+        if (this.socket.readyState === WebSocket.OPEN && this.accepted) {
+            this.socket.binaryType = 'arraybuffer'
+            this.socket.send(chunk)
+        }
+    }
+
     public shutdown() {
         this.isShutdown = true
-        if (this.socket && this.socket.readyState !== WebSocket.CLOSED)
+        if (this.socket && this.socket.readyState !== WebSocket.CLOSED) {
             this.socket.close(1000, 'Reconnect')
+        }
     }
 }

@@ -1,4 +1,4 @@
-import { default as React, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckSquare, faExclamationTriangle, faVideo } from '@fortawesome/free-solid-svg-icons'
 
@@ -9,14 +9,19 @@ function DeviceSelectorRow(props: {
     isSelected: boolean
     onClick: () => void
 }) {
-    const className = `device-row ${props.isSelected ? 'selected' : ''}`
-    return <a className={className} href="#" onClick={props.onClick}>
-        <span className="label">
-            <FontAwesomeIcon className="icon" icon={props.isSelected ? faCheckSquare : faVideo} />
-            {props.device.label}
-        </span>
-        <span className="deviceId">{props.device.deviceId}</span>
-    </a>
+    const { device, isSelected, onClick } = props
+
+    const className = `device-row ${isSelected ? 'selected' : ''}`
+
+    return (
+        <a className={className} href="#" onClick={onClick}>
+            <span className="label">
+                <FontAwesomeIcon className="icon" icon={isSelected ? faCheckSquare : faVideo} />
+                {device.label}
+            </span>
+            <span className="deviceId">{device.deviceId}</span>
+        </a>
+    )
 }
 
 export function DeviceSelector(props: {
@@ -27,30 +32,38 @@ export function DeviceSelector(props: {
     const [devices, setDevices] = useState<MediaDeviceInfo[]>(undefined)
 
     function updateDeviceList() {
-        navigator.mediaDevices.enumerateDevices().then((devices) => {
-            setDevices(devices.filter((device) => device.kind == 'videoinput'))
-            console.log(`MediaDevice enumeration found ${devices.length} devices.`)
+        navigator.mediaDevices.enumerateDevices().then((userDevices) => {
+            setDevices(userDevices.filter((device) => device.kind === 'videoinput'))
+            console.log(`MediaDevice enumeration found ${userDevices.length} devices.`)
         })
     }
 
     function createDeviceElements() {
-        if (!(devices instanceof Array))
+        if (!(devices instanceof Array)) {
             return false
-        else {
-            return devices.map((device) => {
+        }
+
+        return (
+            devices.map((device) => {
                 const isSelected = device.deviceId === props.currentDeviceId
                 const onClick = isSelected
                     ? () => props.onDeviceSelected(device.deviceId)
                     : props.onStop
-                return <DeviceSelectorRow
-                    device={device} key={device.deviceId}
-                    isSelected={isSelected} onClick={onClick} />
+                return (
+                    <DeviceSelectorRow
+                        device={device}
+                        key={device.deviceId}
+                        isSelected={isSelected}
+                        onClick={onClick}
+                    />
+                )
             })
-        }
+        )
     }
 
-    if (devices === undefined)
+    if (devices === undefined) {
         updateDeviceList()
+    }
 
     useEffect(() => {
         const listener = () => updateDeviceList()
@@ -60,15 +73,17 @@ export function DeviceSelector(props: {
         }
     })
 
-    return <div className="device-selector">
-        <span className="prompt">Available video input devices</span>
-        {
-            devices && devices.length > 0
+    return (
+        <div className="device-selector">
+            <span className="prompt">Available video input devices</span>
+            {devices && devices.length > 0
                 ? createDeviceElements()
-                : <span className="not-found">
-                    <FontAwesomeIcon className="icon" icon={faExclamationTriangle} />
-                    No video input device found.
-                </span>
-        }
-    </div>
+                : (
+                    <span className="not-found">
+                        <FontAwesomeIcon className="icon" icon={faExclamationTriangle} />
+                        No video input device found.
+                    </span>
+                )}
+        </div>
+    )
 }

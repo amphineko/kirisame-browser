@@ -1,37 +1,52 @@
-import { default as React, useRef, useEffect } from "react"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import React, { useRef, useEffect } from 'react'
 import { faCamera, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import './player.css'
 
 function CaptureInfo(props: {
-    active: true
+    active: boolean
     constriants: MediaTrackConstraints
     label: string
-} | {
-    active: false
 }) {
-    return props.active
-        ? <div className="info">
-            <FontAwesomeIcon className="icon" icon={faCamera} />
-            <span className="label">{props.label}</span>
-            &nbsp;
-            <span className="resolution">{props.constriants.width}&times;{props.constriants.height}</span>
-            <span className="frame-rate">@{props.constriants.frameRate}</span>
-        </div>
-        : <div className="info">
+    const { active, constriants, label } = props
+
+    if (active) {
+        return (
+            <div className="info">
+                <FontAwesomeIcon className="icon" icon={faCamera} />
+                <span className="label">{label}</span>
+                &nbsp;
+                <span className="resolution">
+                    {constriants.width}
+                    &times;
+                    {constriants.height}
+                </span>
+                <span className="frame-rate">
+                    @
+                    {constriants.frameRate}
+                </span>
+            </div>
+        )
+    }
+
+    return (
+        <div className="info">
             <FontAwesomeIcon className="icon" icon={faExclamationTriangle} />
             No active camera capture
         </div>
+    )
 }
 
 export function CameraPlayer(props: {
     stream: MediaStream
 }) {
+    const { stream } = props
+
     const player = useRef<HTMLVideoElement>()
 
-    const videoTrack = props.stream instanceof MediaStream
-        ? props.stream.getVideoTracks()[0]
+    const videoTrack = stream instanceof MediaStream
+        ? stream.getVideoTracks()[0]
         : undefined
 
     const hasActiveVideoStream = videoTrack instanceof MediaStreamTrack
@@ -41,17 +56,27 @@ export function CameraPlayer(props: {
         : undefined
 
     useEffect(() => {
-        if (hasActiveVideoStream)
-            player.current.srcObject = props.stream
-        return () => player.current.srcObject = null
+        const currentPlayer = player.current
+
+        if (hasActiveVideoStream) {
+            currentPlayer.srcObject = props.stream
+        }
+
+        return () => {
+            currentPlayer.srcObject = null
+        }
     })
 
     return (
         <div className={`camera-player ${hasActiveVideoStream ? 'active' : 'idle'}`}>
-            <video className="player" ref={player} autoPlay></video>
-            {hasActiveVideoStream
-                ? <CaptureInfo active={true} constriants={constriants} label={videoTrack.label} />
-                : <CaptureInfo active={false} />}
+            <video className="player" ref={player} autoPlay>
+                <track />
+            </video>
+            <CaptureInfo
+                active={hasActiveVideoStream}
+                constriants={constriants}
+                label={videoTrack ? videoTrack.label : undefined}
+            />
         </div>
     )
 }

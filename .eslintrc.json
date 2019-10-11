@@ -37,9 +37,10 @@
                 "SwitchCase": 1
             }
         ],
+        "jsx-a11y/media-has-caption": "off",
         "linebreak-style": "off",
         "no-unused-vars": "off",
-        "object-shorthand": "off",
+        "object-shorthand": ["error", "never"],
         "react/jsx-filename-extension": [
             "error",
             {

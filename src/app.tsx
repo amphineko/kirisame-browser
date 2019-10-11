@@ -33,7 +33,9 @@ export function AppMain(props: {
     const [stream, setStream] = useState<MediaStream>(undefined)
     const [appState, setAppState] = useState<AppState>('init')
 
-    const videoConstriants = stream.getVideoTracks()[0].getConstraints()
+    const videoConstriants = stream instanceof MediaStream
+        ? stream.getVideoTracks()[0].getConstraints()
+        : undefined
 
     const currentDeviceId = videoConstriants && videoConstriants.deviceId
         ? videoConstriants.deviceId[0] : undefined
@@ -48,10 +50,7 @@ export function AppMain(props: {
             }
         }).catch((error) => {
             setStream(undefined)
-            console.error(`Cannot start user device: ${{
-                deviceId: deviceId,
-                error: error,
-            }}`)
+            console.error(`Cannot start user device: ${error}`)
         })
     }
 

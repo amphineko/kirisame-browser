@@ -25,7 +25,7 @@ export class ImageService {
         this.video.width = config.width
     }
 
-    public async getBlob(): Promise<Blob> {
+    public async capture(): Promise<Blob> {
         return new Promise((resolve) => {
             const ctx = this.canvas.getContext('2d')
             ctx.drawImage(this.video, 0, 0)

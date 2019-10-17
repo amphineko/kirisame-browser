@@ -1,99 +1,41 @@
-import { AssertionError } from 'assert'
 import React, { useState, useEffect } from 'react'
 
-import { CameraPlayer } from './camera/player'
-import { DeviceSelector } from './camera/device_selector'
-import { Configuration, CaptureOptions } from './config'
-import { ImageSession } from './utils/image_session'
+import { LocalCameraComplex } from './camera/component'
+import { Configuration } from './config'
+import { LambdaComplex } from './session/component'
 import { ImageService } from './utils/image'
-import { AppStateDisplay, AppState } from './utils/state'
 
 import './app.css'
 
-function configureDevice(config: CaptureOptions, deviceId?: string): Promise<MediaStream> {
-    const constrians = {
-        audio: false,
-        video: {
-            frameRate: config.frameRate,
-            height: config.height,
-            width: config.width,
-        },
-    } as MediaStreamConstraints
-
-    if (typeof deviceId === 'string' && deviceId.length > 0) {
-        (constrians.video as MediaTrackConstraints).deviceId = deviceId
-    }
-
-    return navigator.mediaDevices.getUserMedia(constrians)
-}
+let imageService: ImageService
 
 export function AppMain(props: {
     config: Configuration
 }) {
+    const { config } = props
+    const { capture: captureOptions, image: imageOptions, lambda: lambdaOptions } = config
+
     const [stream, setStream] = useState<MediaStream>(undefined)
-    const [appState, setAppState] = useState<AppState>('init')
 
-    const videoConstriants = stream instanceof MediaStream
-        ? stream.getVideoTracks()[0].getConstraints()
-        : undefined
-
-    const currentDeviceId = videoConstriants && videoConstriants.deviceId
-        ? videoConstriants.deviceId[0] : undefined
-
-    function updateDeviceId(deviceId?: string) {
-        configureDevice(props.config.capture, deviceId).then((newStream) => {
-            if (newStream !== stream) { // prevent unnecessary update
-                if (stream.getVideoTracks().length === 0) {
-                    throw new AssertionError({ message: 'Stream should has at lease one video track' })
-                }
-                setStream(newStream)
-            }
-        }).catch((error) => {
-            setStream(undefined)
-            console.error(`Cannot start user device: ${error}`)
-        })
-    }
-
-    if (stream === undefined) {
-        // initialize default device
-        updateDeviceId(undefined)
+    function updateStream(newStream: MediaStream) {
+        if (newStream !== stream) {
+            imageService.setVideoSourceObject(newStream)
+            setStream(newStream)
+        }
     }
 
     useEffect(() => {
-        let imageClient: ImageSession
-        const imageService = new ImageService(props.config.image)
-        imageService.setVideoSourceObject(stream)
-
-        if (stream) { // has active stream
-            imageClient = new ImageSession(props.config.image)
-            imageClient.onclose = () => setAppState('retry')
-            imageClient.onopen = () => setAppState('connected')
-            imageClient.onrequest = () => imageService.getBlob().then((blob) => {
-                const reader = new FileReader()
-                reader.readAsArrayBuffer(blob)
-                reader.onload = (event) => {
-                    imageClient.send(event.target.result as ArrayBuffer)
-                }
-            })
+        if (!imageService) {
+            imageService = new ImageService(imageOptions)
         }
-
-        return () => {
-            if (imageClient) {
-                imageClient.shutdown()
-            }
-        }
-    }, [stream, props])
+    }, [imageOptions])
 
     return (
-        <div className="app-container">
-            <AppStateDisplay state={appState} />
-
-            <CameraPlayer stream={stream} />
-
-            <DeviceSelector
-                currentDeviceId={currentDeviceId}
-                onDeviceSelected={(deviceId) => updateDeviceId(deviceId)}
-                onStop={() => setStream(undefined)}
+        <div className="app-main">
+            <LambdaComplex config={lambdaOptions} stream={stream} />
+            <LocalCameraComplex
+                streamOptions={captureOptions}
+                onstreamchanged={(newStream) => { updateStream(newStream) }}
             />
         </div>
     )

@@ -2,7 +2,7 @@ body {
     font-family: 'Helvetica Neue'
 }
 
-.app-container {
+.app-main {
     margin: 0 auto;
     max-width: 48em;
 }

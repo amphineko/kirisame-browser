@@ -1,21 +1,9 @@
-import { SessionConfiguration as ImageSessionConfiguration } from './utils/image_session'
+import { CaptureStreamOptions } from './camera/component'
+import { LambdaServiceConfiguration } from './session/lambda'
 import { ImageServiceConfiguration } from './utils/image'
 
-export interface CaptureOptions {
-    frameRate: number
-    height: number
-    width: number
-}
-
-export interface StreamingOptions {
-    bitRate: number
-    mime: string
-    retry: number // interval between every reconnect attempt
-    url: string
-}
-
 export interface Configuration {
-    capture: CaptureOptions
-    image: ImageSessionConfiguration & ImageServiceConfiguration
-    streaming: StreamingOptions
+    capture: CaptureStreamOptions
+    image: ImageServiceConfiguration
+    lambda: LambdaServiceConfiguration
 }
